@@ -8,11 +8,14 @@
 function header_info {
   clear
   cat <<"EOF"
-    ____       __    _                ______
-   / __ \___  / /_  (_)___ _____     <  /__ \
-  / / / / _ \/ __ \/ / __ `/ __ \    / /__/ /
- / /_/ /  __/ /_/ / / /_/ / / / /   / // __/
-/_____/\___/_.___/_/\__,_/_/ /_/   /_//____/
+    ______     _______        __       ______   ___       _______      ___        __    _____  ___   ____  ____  ___  ___  
+   /    " \   /"      \      /""\     /" _  "\ |"  |     /"     "|    |"  |      |" \  (\"   \|"  \ ("  _||_ " ||"  \/"  | 
+  // ____  \ |:        |    /    \   (: ( \___)||  |    (: ______)    ||  |      ||  | |.\\   \    ||   (  ) : | \   \  /  
+ /  /    ) :)|_____/   )   /' /\  \   \/ \     |:  |     \/    |      |:  |      |:  | |: \.   \\  |(:  |  | . )  \\  \/   
+(: (____/ //  //      /   //  __'  \  //  \ _   \  |___  // ___)_      \  |___   |.  | |.  \    \. | \\ \__/ //   /\.  \   
+ \        /  |:  __   \  /   /  \\  \(:   _) \ ( \_|:  \(:      "|    ( \_|:  \  /\  |\|    \    \ | /\\ __ //\  /  \   \  
+  \"_____/   |__|  \___)(___/    \___)\_______) \_______)\_______)     \_______)(__\_|_)\___|\____\)(__________)|___/\___| 
+                                                                                                                           
 
 EOF
 }
@@ -60,7 +63,7 @@ function cleanup() {
 
 TEMP_DIR=$(mktemp -d)
 pushd $TEMP_DIR >/dev/null
-if whiptail --backtitle "Proxmox VE Helper Scripts" --title "Debian 12 VM" --yesno "This will create a New Debian 12 VM. Proceed?" 10 58; then
+if whiptail --backtitle "Proxmox VE Helper Scripts" --title "Oracle Linux 9" --yesno "This will create a New Oracle Linux 9. Proceed?" 10 58; then
   :
 else
   header_info && echo -e "⚠ User exited script \n" && exit
@@ -134,10 +137,10 @@ function default_settings() {
   FORMAT=",efitype=4m"
   MACHINE=""
   DISK_CACHE=""
-  HN="debian"
+  HN="oracle linux"
   CPU_TYPE=""
-  CORE_COUNT="2"
-  RAM_SIZE="2048"
+  CORE_COUNT="1"
+  RAM_SIZE="1024"
   BRG="vmbr0"
   MAC="$GEN_MAC"
   VLAN=""
@@ -155,7 +158,7 @@ function default_settings() {
   echo -e "${DGN}Using VLAN: ${BGN}Default${CL}"
   echo -e "${DGN}Using Interface MTU Size: ${BGN}Default${CL}"
   echo -e "${DGN}Start VM when completed: ${BGN}yes${CL}"
-  echo -e "${BL}Creating a Debian 12 VM using the above default settings${CL}"
+  echo -e "${BL}Creating a Oracle Linux 9 using the above default settings${CL}"
 }
 
 function advanced_settings() {
@@ -208,9 +211,9 @@ function advanced_settings() {
     exit-script
   fi
 
-  if VM_NAME=$(whiptail --backtitle "Proxmox VE Helper Scripts" --inputbox "Set Hostname" 8 58 debian --title "HOSTNAME" --cancel-button Exit-Script 3>&1 1>&2 2>&3); then
+  if VM_NAME=$(whiptail --backtitle "Proxmox VE Helper Scripts" --inputbox "Set Hostname" 8 58 oracle linux --title "HOSTNAME" --cancel-button Exit-Script 3>&1 1>&2 2>&3); then
     if [ -z $VM_NAME ]; then
-      HN="debian"
+      HN="oracle linux"
       echo -e "${DGN}Using Hostname: ${BGN}$HN${CL}"
     else
       HN=$(echo ${VM_NAME,,} | tr -d ' ')
@@ -314,8 +317,8 @@ function advanced_settings() {
     START_VM="no"
   fi
 
-  if (whiptail --backtitle "Proxmox VE Helper Scripts" --title "ADVANCED SETTINGS COMPLETE" --yesno "Ready to create a Debian 12 VM?" --no-button Do-Over 10 58); then
-    echo -e "${RD}Creating a Debian 12 VM using the above advanced settings${CL}"
+  if (whiptail --backtitle "Proxmox VE Helper Scripts" --title "ADVANCED SETTINGS COMPLETE" --yesno "Ready to create a Oracle Linux 9?" --no-button Do-Over 10 58); then
+    echo -e "${RD}Creating a Oracle Linux 9 using the above advanced settings${CL}"
   else
     header_info
     echo -e "${RD}Using Advanced Settings${CL}"
@@ -369,8 +372,8 @@ else
 fi
 msg_ok "Using ${CL}${BL}$STORAGE${CL} ${GN}for Storage Location."
 msg_ok "Virtual Machine ID is ${CL}${BL}$VMID${CL}."
-msg_info "Retrieving the URL for the Debian 12 Qcow2 Disk Image"
-URL=https://cloud.debian.org/images/cloud/bookworm/20231228-1609/debian-12-nocloud-amd64-20231228-1609.qcow2
+msg_info "Retrieving the URL for the Oracle Linux 12 Qcow2 Disk Image"
+URL=https://cloud.oracle linux.org/images/cloud/bookworm/20231228-1609/oracle linux-12-nocloud-amd64-20231228-1609.qcow2
 sleep 2
 msg_ok "${CL}${BL}${URL}${CL}"
 wget -q --show-progress $URL
@@ -400,7 +403,7 @@ for i in {0,1}; do
   eval DISK${i}_REF=${STORAGE}:${DISK_REF:-}${!disk}
 done
 
-msg_info "Creating a Debian 12 VM"
+msg_info "Creating a Oracle Linux 9"
 qm create $VMID -agent 1${MACHINE} -tablet 0 -localtime 1 -bios ovmf${CPU_TYPE} -cores $CORE_COUNT -memory $RAM_SIZE \
   -name $HN -tags proxmox-helper-scripts -net0 virtio,bridge=$BRG,macaddr=$MAC$VLAN$MTU -onboot 1 -ostype l26 -scsihw virtio-scsi-pci
 pvesm alloc $STORAGE $VMID $DISK0 4M 1>&/dev/null
@@ -412,15 +415,15 @@ qm set $VMID \
   -serial0 socket \
   -description "<div align='center'><a href='https://Helper-Scripts.com'><img src='https://raw.githubusercontent.com/tteck/Proxmox/main/misc/images/logo-81x112.png'/></a>
 
-  # Debian 12 VM
+  # Oracle Linux 9
 
   <a href='https://ko-fi.com/D1D7EP4GF'><img src='https://img.shields.io/badge/&#x2615;-Buy me a coffee-blue' /></a>
   </div>" >/dev/null
-msg_ok "Created a Debian 12 VM ${CL}${BL}(${HN})"
+msg_ok "Created a Oracle Linux 9 ${CL}${BL}(${HN})"
 if [ "$START_VM" == "yes" ]; then
-  msg_info "Starting Debian 12 VM"
+  msg_info "Starting Oracle Linux 9"
   qm start $VMID
-  msg_ok "Started Debian 12 VM"
+  msg_ok "Started Oracle Linux 9"
 fi
 msg_ok "Completed Successfully!\n"
 echo "More Info at https://github.com/tteck/Proxmox/discussions/1988"
