@@ -373,7 +373,7 @@ fi
 msg_ok "Using ${CL}${BL}$STORAGE${CL} ${GN}for Storage Location."
 msg_ok "Virtual Machine ID is ${CL}${BL}$VMID${CL}."
 msg_info "Retrieving the URL for the Oracle Linux 12 Qcow2 Disk Image"
-URL=https://cloud.oracle linux.org/images/cloud/bookworm/20231228-1609/oracle linux-12-nocloud-amd64-20231228-1609.qcow2
+URL=https://yum.oracle.com/templates/OracleLinux/OL9/u4/x86_64/OL9U4_x86_64-kvm-b234.qcow2
 sleep 2
 msg_ok "${CL}${BL}${URL}${CL}"
 wget -q --show-progress $URL
